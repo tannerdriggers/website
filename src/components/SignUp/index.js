@@ -7,14 +7,14 @@ import * as ROUTES from '../../constants/routes';
 
 const SignUpPage = () => (
     <div>
-        <h1>SignUp</h1>
+        <h1 className="mb-2">Sign Up</h1>
         <SignUpForm />
     </div>
 );
 
 const INITIAL_STATE = {
-    username: '',
-    email: '',
+    username: 'Tanner Driggers',
+    email: 'tannerdriggers@gmail.com',
     passwordOne: '',
     passwordTwo: '',
     error: null,
@@ -28,13 +28,19 @@ class SignUpFormBase extends Component {
     }
 
     onSubmit = event => {
-        const { email, passwordOne } = this.state;
+        const { username, email, passwordOne } = this.state;
 
         this.props.firebase
             .doCreateUserWithEmailAndPassword(email, passwordOne)
-            .this(authUser => {
+            .then(authUser => {
                 this.setState({ ...INITIAL_STATE });
                 this.props.history.push(ROUTES.HOME);
+                return this.props.firebase
+                    .user(authUser.user.uid)
+                    .set({
+                        username,
+                        email,
+                    });
             })
             .catch(error => {
                 this.setState({ error });
@@ -63,13 +69,14 @@ class SignUpFormBase extends Component {
             username === '';
 
         return (
-            <form onSubmit={this.onSubmit}>
+            <form onSubmit={this.onSubmit} className="form-group">
                 <input
                     name="username"
                     value={username}
                     onChange={this.onChange}
                     type="text"
                     placeholder="Full Name"
+                    className="form-control mb-2"
                 />
                 <input
                     name="email"
@@ -77,6 +84,7 @@ class SignUpFormBase extends Component {
                     onChange={this.onChange}
                     type="text"
                     placeholder="Email Address"
+                    className="form-control mb-2"
                 />
                 <input
                     name="passwordOne"
@@ -84,6 +92,7 @@ class SignUpFormBase extends Component {
                     onChange={this.onChange}
                     type="password"
                     placeholder="Password"
+                    className="form-control mb-2"
                 />
                 <input
                     name="passwordTwo"
@@ -91,9 +100,10 @@ class SignUpFormBase extends Component {
                     onChange={this.onChange}
                     type="password"
                     placeholder="Confirm Password"
+                    className="form-control mb-2"
                 />
-                <button disabled={isInvalid} type="submit">Sign Up</button>
-                {error && <p>{error.message}</p>}
+                <button disabled={isInvalid} type="submit" className="btn btn-secondary">Sign Up</button>
+                {error && <p className="text-danger">{error.message}</p>}
             </form>
         );
     }
@@ -101,7 +111,7 @@ class SignUpFormBase extends Component {
 
 const SignUpLink = () => (
     <p>
-        Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
+        Don't have an account? <Link to={ROUTES.SIGN_UP} className="text-primary">Sign Up</Link>
     </p>
 );
 
